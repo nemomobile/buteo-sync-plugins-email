@@ -48,7 +48,7 @@ public slots:
     virtual void connectivityStateChanged(Sync::ConnectivityType type, bool state);
 
 private slots:
-    void syncStatusChanged();
+    void syncStatusChanged(EmailAgent::Status status);
 
 private:
     Buteo::SyncResults m_syncResults;

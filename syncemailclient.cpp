@@ -48,13 +48,13 @@ SyncEmailClient::~SyncEmailClient()
 bool SyncEmailClient::init()
 {
     m_emailAgent = new EmailAgent(this);
-    connect(m_emailAgent, SIGNAL(synchronizingChanged()), this, SLOT(syncStatusChanged()));
+    connect(m_emailAgent, SIGNAL(synchronizingChanged(EmailAgent::Status)), this, SLOT(syncStatusChanged(EmailAgent::Status)));
     return true;
 }
 
 bool SyncEmailClient::uninit()
 {
-    disconnect(m_emailAgent, SIGNAL(synchronizingChanged()), this, SLOT(syncStatusChanged()));
+    disconnect(m_emailAgent, SIGNAL(synchronizingChanged(EmailAgent::Status)), this, SLOT(syncStatusChanged(EmailAgent::Status)));
     return true;
 }
 
@@ -86,13 +86,18 @@ void SyncEmailClient::connectivityStateChanged(Sync::ConnectivityType, bool)
     // TODO
 }
 
-void SyncEmailClient::syncStatusChanged()
+void SyncEmailClient::syncStatusChanged(EmailAgent::Status status)
 {
     // TODO: Do we need to care about various status here ?
     // if so status info needs to be added to EmailAgent
     if (!m_emailAgent->synchronizing()) {
-        updateResults(Buteo::SyncResults(QDateTime::currentDateTime(), Buteo::SyncResults::SYNC_RESULT_SUCCESS, Buteo::SyncResults::NO_ERROR));
-        emit success(getProfileName(), "Sync completed");
+        if (status == EmailAgent::Completed) {
+            updateResults(Buteo::SyncResults(QDateTime::currentDateTime(), Buteo::SyncResults::SYNC_RESULT_SUCCESS, Buteo::SyncResults::NO_ERROR));
+            emit success(getProfileName(), "Sync completed");
+        } else if (status == EmailAgent::Error) {
+            updateResults(Buteo::SyncResults(QDateTime::currentDateTime(), Buteo::SyncResults::SYNC_RESULT_FAILED, Buteo::SyncResults::ABORTED));
+            emit error(getProfileName(), "Sync failed", Buteo::SyncResults::SYNC_RESULT_FAILED);
+        }
     }
 }
 
