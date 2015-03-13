@@ -33,6 +33,10 @@ contains (DEFINES, OUT_OF_PROCESS_PLUGIN) {
 
     DEFINES += "CLASSNAME=SyncEmailClient"
     DEFINES += CLASSNAME_H=\\\"syncemailclient.h\\\"
+
+    # BUTEO_OOPP_QCONNMANBEARER_BUG_WORKAROUND requires -ldl
+    DEFINES += BUTEO_OOPP_QCONNMANBEARER_BUG_WORKAROUND=qconnmanbearer_bug_workaround
+    LIBS += -ldl
 }
 
 HEADERS += syncemailclient.h
